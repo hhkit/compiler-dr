@@ -10,9 +10,9 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showOpenDialog({
 		}).then((uris: vscode.Uri[] | undefined) => {
 			const fm = new FileManager();
-			if (uris)
-				{for (const uri of uris)
-					{fm.loadTraceZip(uri.path);}}
+			if (uris) {
+				for (const uri of uris) { fm.loadTraceZip(uri.path); }
+			}
 		});
 	}));
 }

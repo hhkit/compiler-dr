@@ -26,6 +26,11 @@
           "type": "string",
           "default": "",
           "description": "Path to mlir-r2d2-server"
+        },
+        "r2d2.mlirOptPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to mlir-opt"
         }
       }
     }

@@ -13,13 +13,13 @@ function validateZip(file: PathLike): boolean {
     return true;
 }
 
-function streamToString (stream: Stream.Readable): Promise<string> {
-  const chunks: Buffer<ArrayBuffer>[] = [];
-  return new Promise((resolve, reject) => {
-    stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
-    stream.on('error', (err) => reject(err));
-    stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-  });
+function streamToString(stream: Stream.Readable): Promise<string> {
+    const chunks: Buffer<ArrayBuffer>[] = [];
+    return new Promise((resolve, reject) => {
+        stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+        stream.on('error', (err) => reject(err));
+        stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    });
 }
 
 export class FileManager {
@@ -75,11 +75,9 @@ export class FileManager {
                     const rs = (await entry.stream());
                     const result = await streamToString(rs);
 
-                    if (filename.endsWith("trace.r2d2.mlir")) 
-                        {await this.loadR2D2(result);}
-                    else 
-                        {await this.loadSnapshot(filename, result);}
-                    
+                    if (filename.endsWith("trace.r2d2.mlir")) { await this.loadR2D2(result); }
+                    else { await this.loadSnapshot(filename, result); }
+
                 }
             }
         }

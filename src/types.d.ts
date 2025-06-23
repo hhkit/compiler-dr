@@ -8,10 +8,9 @@ export interface PassPipeline {
   snapshots: Snapshot[]
 }
 
-export interface OpIdentifier 
-{
-    snapshot: Snapshot,
-    line: number,
+export interface OpIdentifier {
+  snapshot: Snapshot,
+  line: number,
 }
 
 
