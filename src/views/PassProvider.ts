@@ -36,11 +36,11 @@ class PassTreeNode extends vscode.TreeItem {
         public readonly collapsibleState: vscode.TreeItemCollapsibleState
     ) {
         super(pass.passName, collapsibleState);
-
+        this.description = pass.snapshotFileName;
         this.command = {
-            "title": "Open ",
-            "command": "vscode.open",
-            "arguments": [pass.snapshotFileName],
+            "title": "Open",
+            "command": "vscode.openWith",
+            "arguments": [vscode.Uri.file(pass.snapshotFileName), "default"],
         };
     }
 

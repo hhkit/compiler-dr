@@ -51,5 +51,6 @@ export type LoadResponse = LoadSuccessResponse | LoadFailureResponse;
 
 export interface R2D2ServerInterface {
   load: (r2d2File: string) => Promise<LoadResponse>
+  loadFile: (r2d2File: string) => Promise<LoadResponse>
   trace: (loc: FileLine, dir: TraceDirection) => Promise<TraceResponse>
 }

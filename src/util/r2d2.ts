@@ -17,7 +17,6 @@ export class R2D2 implements R2D2ServerInterface {
     constructor() {
         const config = vscode.workspace.getConfiguration("r2d2");
         const r2d2path = config.get<string>("serverPath");
-        console.log(`test ${r2d2path}`);
 
         assert(r2d2path);
 
@@ -25,7 +24,7 @@ export class R2D2 implements R2D2ServerInterface {
 
         this.connection = createMessageConnection(
             new StreamMessageReader(this.r2d2process.stdout),
-            new StreamMessageWriter(this.r2d2process.stdin)
+            new StreamMessageWriter(this.r2d2process.stdin),
         );
 
         this.connection.listen();
@@ -34,6 +33,12 @@ export class R2D2 implements R2D2ServerInterface {
     public load(r2d2File: string): Promise<LoadResponse> {
         assert(this.connection);
         return this.connection.sendRequest('r2d2/load', { str: r2d2File });
+    }
+
+
+    public loadFile(r2d2File: string): Promise<LoadResponse> {
+        assert(this.connection);
+        return this.connection.sendRequest('r2d2/load', { filePath: r2d2File });
     }
 
     public trace(loc: FileLine, dir: TraceDirection): Promise<TraceResponse> {

@@ -28,7 +28,6 @@ function streamToString(stream: Stream.Readable): Promise<string> {
 
 export class FileManager {
     private fileLoadStateChangeHandler: FileLoadStateChangeHandler | undefined;
-    private snapshots: Record<string, string> = {};
     private cachedPipeline: PassPipeline | undefined;
     private fileLoadState: FileLoadState = "unloaded";
     private r2d2: R2D2 = new R2D2();
@@ -49,25 +48,18 @@ export class FileManager {
         if (!validateZip(zipPath)) { throw new Error("invalid zip"); }
         this.changeState("loading");
 
-        this.snapshots = {};
         const zip = await unzipper.Open.file(zipPath.toLocaleString());
-        await zip.extract({
-            path: this.workdir.toLocaleString()
-        });
+        await zip.extract({ path: this.workdir.toLocaleString(), });
 
         const tracePath = join(this.workdir.toLocaleString(), "trace.r2d2.mlir");
-        console.log(`opening ${tracePath}`);
 
         const traceBuffer = await fs.readFile(tracePath);
         const str = new TextDecoder('utf-8').decode(traceBuffer);
 
-        console.log(`loaded ${str}`);
         await this.loadR2D2(str);
         this.changeState("loaded");
-        console.log(`done ${JSON.stringify(this.cachedPipeline)}`);
 
         assert(this.cachedPipeline);
-
         return this.cachedPipeline;
     }
 
@@ -89,15 +81,15 @@ export class FileManager {
 
     private async loadR2D2(r2d2text: string): Promise<PassPipeline> {
         const loadResult: LoadResponse = await this.r2d2.load(r2d2text);
-        console.log(`load res: ${JSON.stringify(loadResult)}`);
         if (loadResult.status === "failure") {
-            console.log(`failed: ${loadResult.errorMessage} `);
             throw new Error(`failed to load file with error ${loadResult.errorMessage}`);
         }
         else {
-            console.log(`success: ${JSON.stringify(loadResult)}`);
             this.cachedPipeline = {
-                passes: loadResult.passes
+                passes: loadResult.passes.map(pass => ({
+                    snapshotFileName: path.join(this.workdir.toLocaleString(), pass.snapshotFileName),
+                    passName: pass.passName
+                }))
             };
             return this.cachedPipeline;
         }

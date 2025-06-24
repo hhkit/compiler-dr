@@ -34,7 +34,6 @@ export function executeBinary(binaryPath: string): ChildProcessWithoutNullStream
   const execPath = join(appRootDir.get(), 'resources', getPlatform());
 
   const cmd = `${join(execPath, binaryPath)}`;
-  console.info(`executing ${cmd}`);
   return spawn(cmd);
 }
 

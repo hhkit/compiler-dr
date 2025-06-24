@@ -15,7 +15,6 @@ export async function LoadTrace() {
     const uri = uris[0];
 
     const pipeline = await fm.loadTraceZip(uri.path);
-    console.log("hello");
 
     vscode.window.createTreeView('mlir-doctor', {
         treeDataProvider: new PassProvider(pipeline)
