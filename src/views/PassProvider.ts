@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
 import { PassSnapshot, PassPipeline } from '../types';
 
-type T = number;
-
 export class PassProvider implements vscode.TreeDataProvider<PassTreeNode> {
     constructor(private readonly passPipeline: PassPipeline) {
         console.log(JSON.stringify(passPipeline));
@@ -39,8 +37,8 @@ class PassTreeNode extends vscode.TreeItem {
         this.description = pass.snapshotFileName;
         this.command = {
             "title": "Open",
-            "command": "vscode.openWith",
-            "arguments": [vscode.Uri.file(pass.snapshotFileName), "default"],
+            "command": "vscode.open",
+            "arguments": [vscode.Uri.file(pass.snapshotFileName)],
         };
     }
 

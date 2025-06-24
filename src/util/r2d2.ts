@@ -1,4 +1,4 @@
-import { FileLine, LoadResponse, OpIdentifier, PassPipeline, R2D2ServerInterface, TraceDirection, TraceResponse } from "../types";
+import { FileLine, LoadResponse, R2D2ServerInterface, TraceDirection, TraceResponse } from "../types";
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { createMessageConnection, MessageConnection } from "vscode-jsonrpc";
 import { StreamMessageReader, StreamMessageWriter } from "vscode-jsonrpc/node";

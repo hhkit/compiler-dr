@@ -1,29 +1,17 @@
-import { fstat, PathLike } from "fs";
+import { PathLike } from "fs";
 import { LoadResponse, OpIdentifier, PassPipeline } from "../types";
 import { FileLoadState, R2D2 } from "./r2d2";
-import Stream from "stream";
 import unzipper from "unzipper";
 import assert from "assert";
 import fs from "fs/promises";
 import path, { join } from "path";
-import { trace } from "console";
 
 type FileLoadStateChangeHandler = (currState: FileLoadState) => void;
-
 
 function validateZip(file: PathLike): boolean {
     if (!file.toString().endsWith(".zip")) { return false; }
 
     return true;
-}
-
-function streamToString(stream: Stream.Readable): Promise<string> {
-    const chunks: Buffer<ArrayBuffer>[] = [];
-    return new Promise((resolve, reject) => {
-        stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
-        stream.on('error', (err) => reject(err));
-        stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-    });
 }
 
 export class FileManager {
