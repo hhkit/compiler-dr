@@ -33,6 +33,28 @@
           "description": "Path to mlir-opt"
         }
       }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "mlir-doctor",
+          "title": "MLIR Trace Explorer",
+          "icon": "media/dep.svg"
+        }
+      ]
+    },
+    "views": {
+      "mlir-doctor": [
+        {
+          "id": "mlir-doctor",
+          "name": "MLIR Trace Explorer",
+          "icon": "media/dep.svg",
+          "contextualTitle": "MLIR Trace Explorer"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": []
     }
   },
   "scripts": {
@@ -52,13 +74,10 @@
     "@types/node": "20.x",
     "@types/unzipper": "^0.10.11",
     "@types/vscode": "^1.101.0",
-    "@types/yauzl": "^2.10.3",
-    "@types/yauzl-promise": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
-    "copy-webpack-plugin": "^13.0.0",
     "eslint": "^9.25.1",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.3",
