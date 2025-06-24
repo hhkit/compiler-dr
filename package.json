@@ -34,14 +34,8 @@
         }
       }
     },
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "mlir-doctor",
-          "title": "MLIR Trace Explorer",
-          "icon": "media/dep.svg"
-        }
-      ]
+    "menus": {
+      "view/title": []
     },
     "views": {
       "mlir-doctor": [
@@ -53,9 +47,21 @@
         }
       ]
     },
-    "menus": {
-      "view/title": []
-    }
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "mlir-doctor",
+          "title": "MLIR Trace Explorer",
+          "icon": "media/dep.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "mlir-doctor",
+        "contents": "No trace loaded.\n[Load Trace](command:mlir.loadTrace)"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

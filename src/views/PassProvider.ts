@@ -1,22 +1,22 @@
 import * as vscode from 'vscode';
-import { PassPipeline, Snapshot } from '../types';
+import { PassSnapshot, PassPipeline } from '../types';
 
 type T = number;
 
-export class PassProvider implements vscode.TreeDataProvider<SnapshotNode> {
+export class PassProvider implements vscode.TreeDataProvider<PassTreeNode> {
     passPipeline: PassPipeline;
 
     constructor(private pipeline: PassPipeline) {
         this.passPipeline = pipeline;
     }
 
-    getChildren(element: SnapshotNode): vscode.ProviderResult<SnapshotNode[]> {
+    getChildren(element: PassTreeNode): vscode.ProviderResult<PassTreeNode[]> {
         if (!element) {
             // root
             // return all snapshots
-            return this.passPipeline.snapshots.map((snapshot) => {
-                return new SnapshotNode(
-                    snapshot,
+            return this.passPipeline.passes.map((pass) => {
+                return new PassTreeNode(
+                    pass,
                     vscode.TreeItemCollapsibleState.None
                 );
             });
@@ -27,17 +27,23 @@ export class PassProvider implements vscode.TreeDataProvider<SnapshotNode> {
         }
     }
 
-    getTreeItem(_element: SnapshotNode): vscode.TreeItem {
+    getTreeItem(_element: PassTreeNode): vscode.TreeItem {
         return _element;
     }
 }
 
-class SnapshotNode extends vscode.TreeItem {
+class PassTreeNode extends vscode.TreeItem {
     constructor(
-        public readonly values: Snapshot,
+        public readonly pass: PassSnapshot,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState
     ) {
-        super(values.filename, collapsibleState);
+        super(pass.passName, collapsibleState);
+
+        this.command = {
+            "title": "Open ",
+            "command": "vscode.open",
+            "arguments": [pass.snapshotFileName],
+        };
     }
 
     // iconPath = {

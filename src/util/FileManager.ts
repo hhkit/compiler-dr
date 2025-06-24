@@ -3,6 +3,7 @@ import { LoadResponse, OpIdentifier, PassPipeline } from "../types";
 import { FileLoadState, R2D2 } from "./r2d2";
 import Stream from "stream";
 import unzipper from "unzipper";
+import assert from "assert";
 
 type FileLoadStateChangeHandler = (currState: FileLoadState) => void;
 
@@ -24,42 +25,23 @@ function streamToString(stream: Stream.Readable): Promise<string> {
 
 export class FileManager {
     private fileLoadStateChangeHandler: FileLoadStateChangeHandler | undefined;
-    private snapshots: Record<string, string>;
-    private snapshotOrder: string[];
+    private snapshots: Record<string, string> = {};
+    private cachedPipeline: PassPipeline | undefined;
     private fileLoadState: FileLoadState = "unloaded";
     private r2d2: R2D2 = new R2D2();
 
     constructor() {
-        // placeholder values
-        this.snapshots = {
-            test: "unloaded mlir",
-            test2: "also unloaded mlir"
-        };
-        this.snapshotOrder = ["test", "test2"];
     }
 
     public get loadState(): FileLoadState {
         return this.fileLoadState;
     }
 
-    public get pipeline(): PassPipeline {
-        const retval = {
-            passes: this.snapshotOrder,
-            snapshots: this.snapshotOrder.map((snapshot) => {
-                return {
-                    filename: snapshot,
-                    mlirCode: this.snapshots[snapshot]
-                };
-            })
-        };
-        return retval;
-    }
-
     public setLoadStateChangeHandler(handler: FileLoadStateChangeHandler): void {
         this.fileLoadStateChangeHandler = handler;
     }
 
-    public async loadTraceZip(zipPath: PathLike): Promise<void> {
+    public async loadTraceZip(zipPath: PathLike): Promise<PassPipeline> {
         if (!validateZip(zipPath)) { throw new Error("invalid zip"); }
         this.changeState("loading");
 
@@ -72,7 +54,7 @@ export class FileManager {
                 if (filename.endsWith("/")) {
                     // directory
                 } else {
-                    const rs = (await entry.stream());
+                    const rs = entry.stream();
                     const result = await streamToString(rs);
 
                     if (filename.endsWith("trace.r2d2.mlir")) { await this.loadR2D2(result); }
@@ -87,34 +69,41 @@ export class FileManager {
         }
 
         this.changeState("loaded");
+        assert(this.cachedPipeline);
+        return this.cachedPipeline;
     }
 
     public async traceOp(op: OpIdentifier): Promise<OpIdentifier[]> {
         const traceResponse = await this.r2d2.trace({
-            filename: op.snapshot.filename,
+            filename: op.snapshotFileName,
             line: op.line,
         }, 'back');
 
-        return traceResponse.status === "success" ? traceResponse.locations.map((flc: any) => ({
-            snapshot: {
-                filename: flc.filename,
-                mlirCode: this.snapshots[flc.filename]
-            },
-            line: flc.line
-        }))
-            : [];
+        if (traceResponse.status === "success") {
+            return traceResponse.locations.map(fl => ({
+                snapshotFileName: fl.filename,
+                line: fl.line,
+            }));
+        } else {
+            throw new Error(traceResponse.errorMessage);
+        }
     }
 
-    private async loadR2D2(r2d2text: string): Promise<void> {
+    private async loadR2D2(r2d2text: string): Promise<PassPipeline> {
         const loadResult: LoadResponse = await this.r2d2.load(r2d2text);
         if (loadResult.status === "failure") {
             console.log(`failed: ${loadResult.errorMessage} `);
+            throw new Error(`failed to load file with error ${loadResult.errorMessage}`);
         }
         else {
-            this.snapshotOrder = loadResult.snapshots;
-            console.log(`success: ${loadResult.snapshots}`);
+            console.log(`success: ${JSON.stringify(loadResult)}`);
+            this.cachedPipeline = {
+                passes: loadResult.passes
+            };
+            return this.cachedPipeline;
         }
     }
+
 
     private async loadSnapshot(fileName: string, snapshotFileText: string): Promise<void> {
         this.snapshots[fileName] = snapshotFileText;

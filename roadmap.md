@@ -24,3 +24,8 @@ trace
 - debugging
     - research into LLDB, breakpoint through a linear algebra func and visualize it
     - natvis for mlir types?
+
+
+#### 
+- how does lean do rewrites?
+- 

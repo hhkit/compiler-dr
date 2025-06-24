@@ -12,9 +12,9 @@ export async function LoadTrace() {
     const fm = new FileManager();
     const uri = uris[0];
 
-    await fm.loadTraceZip(uri.path);
+    const pipeline = await fm.loadTraceZip(uri.path);
 
     vscode.window.createTreeView('mlir-doctor', {
-        treeDataProvider: new PassProvider(fm.pipeline)
+        treeDataProvider: new PassProvider(pipeline)
     });
 }

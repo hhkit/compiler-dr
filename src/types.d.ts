@@ -1,18 +1,16 @@
-export interface Snapshot {
-  filename: string
-  mlirCode: string
+export interface PassSnapshot {
+  passName: string;
+  snapshotFileName: string;
 }
 
 export interface PassPipeline {
-  passes: string[]
-  snapshots: Snapshot[]
+  passes: PassSnapshot[]
 }
 
 export interface OpIdentifier {
-  snapshot: Snapshot,
+  snapshotFileName: string,
   line: number,
 }
-
 
 export interface FileLine {
   filename: string;
@@ -32,7 +30,6 @@ export interface TraceSuccessResponse {
   locations: FileLine[];
 }
 
-
 export interface TraceFailureResponse {
   status: "failure",
   errorMessage: string,
@@ -42,8 +39,7 @@ export type TraceResponse = TraceSuccessResponse | TraceFailureResponse;
 
 export interface LoadSuccessResponse {
   status: "success",
-  passes: string[],
-  snapshots: string[],
+  passes: PassSnapshot[],
 }
 
 export interface LoadFailureResponse {
