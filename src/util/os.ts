@@ -1,7 +1,10 @@
 import appRootDir from 'app-root-dir';
 import { env, platform } from 'process';
-import { join, dirname } from 'path';
+import path, { join, dirname } from 'path';
 import { spawn, type ChildProcessWithoutNullStreams } from 'child_process';
+import { openSync, PathLike } from 'fs';
+import fs from 'fs/promises';
+import os from 'os';
 
 export type OSIdentifier = 'linux' | 'mac' | 'win';
 
@@ -33,4 +36,8 @@ export function executeBinary(binaryPath: string): ChildProcessWithoutNullStream
   const cmd = `${join(execPath, binaryPath)}`;
   console.info(`executing ${cmd}`);
   return spawn(cmd);
+}
+
+export async function createWorkdir(): Promise<PathLike> {
+  return await fs.mkdtemp(path.join(os.tmpdir(), 'mlirdoc-'));
 }

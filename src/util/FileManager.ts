@@ -1,9 +1,12 @@
-import { PathLike } from "fs";
+import { fstat, PathLike } from "fs";
 import { LoadResponse, OpIdentifier, PassPipeline } from "../types";
 import { FileLoadState, R2D2 } from "./r2d2";
 import Stream from "stream";
 import unzipper from "unzipper";
 import assert from "assert";
+import fs from "fs/promises";
+import path, { join } from "path";
+import { trace } from "console";
 
 type FileLoadStateChangeHandler = (currState: FileLoadState) => void;
 
@@ -30,7 +33,8 @@ export class FileManager {
     private fileLoadState: FileLoadState = "unloaded";
     private r2d2: R2D2 = new R2D2();
 
-    constructor() {
+    constructor(private readonly workdir: PathLike) {
+        console.log(`workdir: ${workdir}`);
     }
 
     public get loadState(): FileLoadState {
@@ -46,30 +50,24 @@ export class FileManager {
         this.changeState("loading");
 
         this.snapshots = {};
-
         const zip = await unzipper.Open.file(zipPath.toLocaleString());
-        try {
-            for (const entry of zip.files) {
-                const filename = entry.path;
-                if (filename.endsWith("/")) {
-                    // directory
-                } else {
-                    const rs = entry.stream();
-                    const result = await streamToString(rs);
+        await zip.extract({
+            path: this.workdir.toLocaleString()
+        });
 
-                    if (filename.endsWith("trace.r2d2.mlir")) { await this.loadR2D2(result); }
-                    else { await this.loadSnapshot(filename, result); }
+        const tracePath = join(this.workdir.toLocaleString(), "trace.r2d2.mlir");
+        console.log(`opening ${tracePath}`);
 
-                }
-            }
-        }
-        catch (e) {
-            // handle stuff 
-            console.error(e);
-        }
+        const traceBuffer = await fs.readFile(tracePath);
+        const str = new TextDecoder('utf-8').decode(traceBuffer);
 
+        console.log(`loaded ${str}`);
+        await this.loadR2D2(str);
         this.changeState("loaded");
+        console.log(`done ${JSON.stringify(this.cachedPipeline)}`);
+
         assert(this.cachedPipeline);
+
         return this.cachedPipeline;
     }
 
@@ -81,7 +79,7 @@ export class FileManager {
 
         if (traceResponse.status === "success") {
             return traceResponse.locations.map(fl => ({
-                snapshotFileName: fl.filename,
+                snapshotFileName: path.join(this.workdir.toLocaleString(), fl.filename),
                 line: fl.line,
             }));
         } else {
@@ -91,6 +89,7 @@ export class FileManager {
 
     private async loadR2D2(r2d2text: string): Promise<PassPipeline> {
         const loadResult: LoadResponse = await this.r2d2.load(r2d2text);
+        console.log(`load res: ${JSON.stringify(loadResult)}`);
         if (loadResult.status === "failure") {
             console.log(`failed: ${loadResult.errorMessage} `);
             throw new Error(`failed to load file with error ${loadResult.errorMessage}`);
@@ -102,11 +101,6 @@ export class FileManager {
             };
             return this.cachedPipeline;
         }
-    }
-
-
-    private async loadSnapshot(fileName: string, snapshotFileText: string): Promise<void> {
-        this.snapshots[fileName] = snapshotFileText;
     }
 
     private changeState(newState: FileLoadState): void {

@@ -4,10 +4,8 @@ import { PassSnapshot, PassPipeline } from '../types';
 type T = number;
 
 export class PassProvider implements vscode.TreeDataProvider<PassTreeNode> {
-    passPipeline: PassPipeline;
-
-    constructor(private pipeline: PassPipeline) {
-        this.passPipeline = pipeline;
+    constructor(private readonly passPipeline: PassPipeline) {
+        console.log(JSON.stringify(passPipeline));
     }
 
     getChildren(element: PassTreeNode): vscode.ProviderResult<PassTreeNode[]> {
