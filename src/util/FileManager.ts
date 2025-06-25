@@ -59,7 +59,7 @@ export class FileManager {
 
         if (traceResponse.status === "success") {
             return traceResponse.locations.map(fl => ({
-                snapshotFileName: path.join(this.workdir.toLocaleString(), fl.filename),
+                snapshotFileName: fl.filename,
                 line: fl.line,
             }));
         } else {
@@ -75,8 +75,9 @@ export class FileManager {
         else {
             this.cachedPipeline = {
                 passes: loadResult.passes.map(pass => ({
-                    snapshotFileName: path.join(this.workdir.toLocaleString(), pass.snapshotFileName),
-                    passName: pass.passName
+                    snapshotFileName: pass.snapshotFileName,
+                    passName: pass.passName,
+                    snapshotLocation: this.toWorkdir(pass.snapshotFileName),
                 }))
             };
             return this.cachedPipeline;
@@ -88,5 +89,13 @@ export class FileManager {
             this.fileLoadState = newState;
             this.fileLoadStateChangeHandler?.(newState);
         }
+    }
+
+    private toWorkdir(filePath: string): string {
+        return path.join(this.workdir.toString(), filePath);
+    }
+
+    private fromWorkdir(filePath: string): string {
+        return path.relative(this.workdir.toString(), filePath);
     }
 }

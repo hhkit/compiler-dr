@@ -2,9 +2,14 @@ export interface PassSnapshot {
   passName: string;
   snapshotFileName: string;
 }
+export interface LoadedPassSnapshot extends PassSnapshot {
+  passName: string;
+  snapshotFileName: string;
+  snapshotLocation: string;
+}
 
 export interface PassPipeline {
-  passes: PassSnapshot[]
+  passes: LoadedPassSnapshot[]
 }
 
 export interface OpIdentifier {

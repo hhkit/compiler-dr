@@ -17,6 +17,7 @@ trace
     - rewrite
 
 #### features
+- we want to be able to at minimum compare a snapshot with its previous snapshot
 - filter the trace?
 - disambiguate CSE operations 
 - profiling

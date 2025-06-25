@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { PassSnapshot, PassPipeline } from '../types';
+import { PassPipeline, LoadedPassSnapshot } from '../types';
 
 export class PassProvider implements vscode.TreeDataProvider<PassTreeNode> {
     constructor(private readonly passPipeline: PassPipeline) {
@@ -30,15 +30,19 @@ export class PassProvider implements vscode.TreeDataProvider<PassTreeNode> {
 
 class PassTreeNode extends vscode.TreeItem {
     constructor(
-        public readonly pass: PassSnapshot,
+        public readonly pass: LoadedPassSnapshot,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState
     ) {
         super(pass.passName, collapsibleState);
         this.description = pass.snapshotFileName;
+
+        const t: vscode.TextDocumentShowOptions = {
+        };
+
         this.command = {
             "title": "Open",
             "command": "vscode.open",
-            "arguments": [vscode.Uri.file(pass.snapshotFileName)],
+            "arguments": [vscode.Uri.file(pass.snapshotLocation)],
         };
     }
 
