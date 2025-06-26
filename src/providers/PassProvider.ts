@@ -3,7 +3,6 @@ import { PassPipeline, LoadedPassSnapshot } from '../types';
 
 export class PassProvider implements vscode.TreeDataProvider<PassTreeNode> {
     constructor(private readonly passPipeline: PassPipeline) {
-        console.log(JSON.stringify(passPipeline));
     }
 
     getChildren(element: PassTreeNode): vscode.ProviderResult<PassTreeNode[]> {
@@ -36,12 +35,9 @@ class PassTreeNode extends vscode.TreeItem {
         super(pass.passName, collapsibleState);
         this.description = pass.snapshotFileName;
 
-        const t: vscode.TextDocumentShowOptions = {
-        };
-
         this.command = {
             "title": "Open",
-            "command": "vscode.open",
+            "command": "mlir.openSnapshot",
             "arguments": [vscode.Uri.file(pass.snapshotLocation)],
         };
     }

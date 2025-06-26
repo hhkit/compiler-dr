@@ -18,10 +18,12 @@ export class FileManager {
     private fileLoadStateChangeHandler: FileLoadStateChangeHandler | undefined;
     private cachedPipeline: PassPipeline | undefined;
     private fileLoadState: FileLoadState = "unloaded";
-    private r2d2: R2D2 = new R2D2();
 
-    constructor(private readonly workdir: PathLike) {
-        console.log(`workdir: ${workdir}`);
+    constructor(
+        private readonly r2d2: R2D2,
+        private readonly workdir: PathLike,
+    ) {
+        console.info(`workdir: ${workdir}`);
     }
 
     public get loadState(): FileLoadState {
